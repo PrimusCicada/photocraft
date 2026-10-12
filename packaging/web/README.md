@@ -81,10 +81,9 @@ Measured on the 0.2.x build (`packaging/web/package.sh`; gzip `-9`, Brotli quali
 | `photocraft-web-<hash>_bg.wasm` | 19,680,726 bytes (18.8 MiB) | 8,177,260 (7.8 MiB) | 5,868,731 (5.6 MiB) |
 | `photocraft-web-<hash>.js` | about 160 KB | about 23 KB | about 20 KB |
 
-Per-file upload limits: Cloudflare Pages and Workers static assets reject any file over
-**25 MiB** (26,214,400 bytes). The wasm fits, and `packaging/web/package.sh` fails the build if
-it ever grows past 24 MiB, so a release can't ship a file a common host refuses. (Releases up to
-0.2.0 shipped a 25.8 MiB wasm, which Cloudflare rejected; issue #198.) The size comes from the
+The build has no size limit, so pick a host without a per-file cap below the wasm's size (Cloudflare
+Pages and Workers static assets reject files over 25 MiB; NGINX, Apache and most object stores don't
+limit file size). The size comes from the
 `wasm-release` Cargo profile (fat LTO, size-optimized code with the pixel crates kept at full
 speed) plus `wasm-opt -Oz`.
 
@@ -129,7 +128,7 @@ Local test: `python3 -m http.server 8765` inside the folder, then open http://lo
 ## Fonts
 
 The app has two fonts of its own, Inter and JetBrains Mono: a browser offers no system fonts, and
-embedding more would push the wasm over the size gate. A host can serve more fonts next to the
+embedding more would make the wasm much larger. A host can serve more fonts next to the
 app. They show in the font menus straight away, and a family's files are downloaded the first time
 it is picked or a document's text needs it, so starting the app costs one small text file.
 
